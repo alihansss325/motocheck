@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="__CSRF_TOKEN__">
+    <title>MotoCheck - Sistem Pakar Diagnosa Kerusakan Sepeda Motor</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#f97316',
+                        'primary-hover': '#ea580c',
+                        'primary-light': '#ffedd5',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom Stylesheet (style.css) with Cache-Buster -->
+    <link rel="stylesheet" href="style.css?v=2">
+    
+    <!-- Application Logic (app.js) with Cache-Buster -->
+    <script src="app.js?v=4" defer></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col selection:bg-orange-500 selection:text-white">
+
+    <!-- Header & Top Navigation Bar -->
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 shadow-xl transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- Brand Logo & Identity -->
+                <div class="flex items-center space-x-3 cursor-pointer group" onclick="switchTab('home')">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-lg shadow-orange-500/25 group-hover:scale-105 transition-transform duration-300">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-2xl font-extrabold tracking-tight text-white">Moto<span class="text-orange-500">Check</span></span>
+                            <span class="hidden sm:inline-flex px-2 py-0.5 text-xs font-semibold rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20">Sistem Pakar v2.0</span>
+                        </div>
+                        <p class="text-xs text-slate-400 hidden sm:block">Diagnosa Pintar & Transparansi Servis Motor</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation Tabs -->
+                <nav class="hidden md:flex items-center space-x-1.5 bg-slate-800/80 p-1.5 rounded-2xl border border-slate-700/60 shadow-inner">
+                    <button id="nav-btn-home" onclick="switchTab('home')" 
+                        class="tab-btn px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 flex items-center space-x-2 bg-orange-500 text-white shadow-md shadow-orange-500/25">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        <span>Beranda</span>
+                    </button>
+                    <button id="nav-btn-diagnosa" onclick="switchTab('diagnosa')" 
+                        class="tab-btn px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 flex items-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-700/50">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                        <span>Diagnosa Interaktif</span>
+                    </button>
+                    <button id="nav-btn-katalog" onclick="switchTab('katalog')" 
+                        class="tab-btn px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 flex items-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-700/50">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>Katalog & Jadwal Servis</span>
+                    </button>
+                </nav>
+
+                <!-- Action Button in Header -->
+                <div class="hidden sm:flex items-center gap-2">
+                    __DESKTOP_ACCOUNT_ACTION__
+                    __LOGOUT_ACTION__
+                </div>
+
+                <!-- Mobile Hamburger Button -->
+                <div class="flex md:hidden">
+                    <button id="mobile-menu-toggle" onclick="toggleMobileMenu()" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Dropdown Navigation -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4 pt-2 border-t border-slate-800 space-y-1">
+                <button onclick="switchTab('home'); toggleMobileMenu()" class="w-full text-left px-4 py-3 rounded-xl font-medium text-sm flex items-center space-x-3 text-slate-200 hover:bg-slate-800">
+                    <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    <span>Beranda</span>
+                </button>
+                <button onclick="switchTab('diagnosa'); toggleMobileMenu()" class="w-full text-left px-4 py-3 rounded-xl font-medium text-sm flex items-center space-x-3 text-slate-200 hover:bg-slate-800">
+                    <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    <span>Diagnosa Interaktif</span>
+                </button>
+                <button onclick="switchTab('katalog'); toggleMobileMenu()" class="w-full text-left px-4 py-3 rounded-xl font-medium text-sm flex items-center space-x-3 text-slate-200 hover:bg-slate-800">
+                    <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>Katalog & Jadwal Servis</span>
+                </button>
+                __MOBILE_ACCOUNT_ACTION__
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow">
+
+        <!-- ======================================================= -->
+        <!-- TAB 1: BERANDA (HOME)                                   -->
+        <!-- ======================================================= -->
+        <section id="tab-home" class="tab-content transition-opacity duration-300">
+            <!-- Hero Banner -->
+            <div class="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28">
+                <!-- Glowing Ambient Blobs -->
+                <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-orange-500/15 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute top-1/3 right-10 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    <div class="text-center max-w-3xl mx-auto">
+                        <!-- Top Badge -->
+                        <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs sm:text-sm font-semibold mb-6 shadow-sm">
+                            <span class="flex h-2 w-2 relative">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                            </span>
+                            <span>Sistem Pakar Perbaikan Sepeda Motor Mandiri</span>
+                        </div>
+
+                        <!-- Main Heading -->
+                        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight sm:leading-tight mb-6">
+                            Ketahui Kerusakan Motormu <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-orange-500 to-amber-500">Sebelum Pergi ke Bengkel!</span>
+                        </h1>
+
+                        <!-- Subtitle (Overcharging Prevention) -->
+                        <p class="text-base sm:text-lg text-slate-300 leading-relaxed mb-10 max-w-2xl mx-auto">
+                            Hindari risiko <span class="text-orange-400 font-semibold">overcharging</span> (getok harga) dan diagnosa asal-asalan dari oknum bengkel nakal. Dapatkan analisis gejala akurat, solusi tindakan mandiri, status urgensi pergantian komponen, serta kisaran estimasi biaya perbaikan suku cadang secara transparan.
+                        </p>
+
+                        <!-- Action Buttons -->
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5">
+                            <button onclick="switchTab('diagnosa')" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-600 text-white font-bold text-base shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:from-orange-600 hover:to-amber-700 transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center space-x-3">
+                                <span>Mulai Diagnosa Sekarang</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </button>
+                            <button onclick="switchTab('katalog')" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-slate-800 hover:bg-slate-700/80 text-slate-200 hover:text-white font-semibold text-base border border-slate-700 hover:border-slate-600 transition-all duration-200 flex items-center justify-center space-x-2">
+                                <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                <span>Cek Jadwal Servis</span>
+                            </button>
+                        </div>
+
+                        <!-- Statistics / Highlights Banner -->
+                        <div class="mt-12 pt-8 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                            <div class="p-3">
+                                <p class="text-2xl font-bold text-orange-400">100%</p>
+                                <p class="text-xs text-slate-400 mt-1">Gratis & Tanpa Login</p>
+                            </div>
+                            <div class="p-3">
+                                <p class="text-2xl font-bold text-orange-400">Aturan Akurat</p>
+                                <p class="text-xs text-slate-400 mt-1">Basis Pengetahuan Pakar</p>
+                            </div>
+                            <div class="p-3">
+                                <p class="text-2xl font-bold text-orange-400">Transparan</p>
+                                <p class="text-xs text-slate-400 mt-1">Estimasi Biaya Wajar</p>
+                            </div>
+                            <div class="p-3">
+                                <p class="text-2xl font-bold text-orange-400">Anti-Getok</p>
+                                <p class="text-xs text-slate-400 mt-1">Solusi & Urgensi Jelas</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3 Feature Cards Section -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+                <div class="text-center mb-14">
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Tiga Fitur Utama MotoCheck</h2>
+                    <p class="text-slate-400 mt-3 text-sm sm:text-base max-w-xl mx-auto">Sistem cerdas terlengkap untuk menemani Anda mengenali gejala masalah motor sebelum menginjakkan kaki ke bengkel.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Feature Card 1: Diagnosa Interaktif -->
+                    <div class="bg-slate-800/60 hover:bg-slate-800/90 border border-slate-700/60 hover:border-orange-500/50 rounded-3xl p-8 transition-all duration-300 transform hover:-translate-y-1 shadow-lg group">
+                        <div class="w-14 h-14 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-orange-400 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Diagnosa Interaktif</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                            Pilih gejala kerusakan fisik yang dialami sepeda motor Anda melalui formulir checklist praktis yang dikelompokkan ke sistem kelistrikan, performa mesin, dan CVT matic.
+                        </p>
+                        <button onclick="switchTab('diagnosa')" class="inline-flex items-center text-sm font-semibold text-orange-400 group-hover:text-orange-300">
+                            Coba Diagnosa 
+                            <svg class="w-4 h-4 ml-1.5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                    </div>
+
+                    <!-- Feature Card 2: Solusi & Status Urgensi -->
+                    <div class="bg-slate-800/60 hover:bg-slate-800/90 border border-slate-700/60 hover:border-orange-500/50 rounded-3xl p-8 transition-all duration-300 transform hover:-translate-y-1 shadow-lg group">
+                        <div class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Solusi & Status Urgensi</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                            Ketahui akar masalah, panduan pertolongan pertama, status tingkat bahaya (Ringan/Sedang/Berat), serta kepastian apakah suku cadang wajib diganti atau cukup diservis saja.
+                        </p>
+                        <button onclick="switchTab('diagnosa')" class="inline-flex items-center text-sm font-semibold text-orange-400 group-hover:text-orange-300">
+                            Lihat Rincian Kerusakan
+                            <svg class="w-4 h-4 ml-1.5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                    </div>
+
+                    <!-- Feature Card 3: Katalog Servis Berfilter -->
+                    <div class="bg-slate-800/60 hover:bg-slate-800/90 border border-slate-700/60 hover:border-orange-500/50 rounded-3xl p-8 transition-all duration-300 transform hover:-translate-y-1 shadow-lg group">
+                        <div class="w-14 h-14 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-orange-400 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Katalog Servis Berfilter</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                            Jelajahi panduan penggantian suku cadang dengan fitur pencarian real-time dan filter kategori. Lengkap dengan kalkulator pengecekan servis berdasarkan jarak tempuh (KM).
+                        </p>
+                        <button onclick="switchTab('katalog')" class="inline-flex items-center text-sm font-semibold text-orange-400 group-hover:text-orange-300">
+                            Buka Katalog Servis
+                            <svg class="w-4 h-4 ml-1.5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ======================================================= -->
+        <!-- TAB 2: DIAGNOSA INTERAKTIF (FITUR INTI)                 -->
+        <!-- ======================================================= -->
+        <section id="tab-diagnosa" class="tab-content hidden transition-opacity duration-300 py-10 lg:py-16">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Section Header -->
+                <div class="text-center mb-10">
+                    <span class="inline-block px-3.5 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-semibold uppercase tracking-wider mb-3">
+                        Mesin Inferensi Sistem Pakar
+                    </span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Formulir Diagnosa Gejala</h2>
+                    <p class="text-slate-400 mt-2 text-sm sm:text-base max-w-xl mx-auto">
+                        Centang satu atau beberapa gejala fisik yang sedang terjadi pada motor Anda di bawah ini, lalu klik tombol analisis.
+                    </p>
+                </div>
+
+                <!-- Form Diagnosa -->
+                <form id="form-diagnosa" onsubmit="prosesDiagnosa(event)" class="space-y-8">
+                    
+                    <!-- KATEGORI 1: Bagian Kelistrikan & Starter -->
+                    <div class="bg-slate-800/80 border border-slate-700/70 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+                        <div class="absolute -right-8 -top-8 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl pointer-events-none"></div>
+                        
+                        <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-slate-700/60">
+                            <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">Bagian Kelistrikan & Starter</h3>
+                                <p class="text-xs text-slate-400">Permasalahan baterai aki, dinamo starter, dan sistem catu daya motor</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <!-- G01 -->
+                            <label for="gejala-G01" class="flex items-start p-4 rounded-2xl bg-slate-900/60 hover:bg-slate-900 border border-slate-700/50 hover:border-orange-500/50 cursor-pointer transition-all duration-200 group">
+                                <div class="flex items-center h-6">
+                                    <input id="gejala-G01" name="gejala" value="G01" type="checkbox" class="custom-checkbox">
+                                </div>
+                                <div class="ml-4 flex-1">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="inline-block px-2 py-0.5 rounded text-xs font-mono font-semibold bg-orange-500/10 text-orange-400 border border-orange-500/20">G01</span>
+                                        <span class="text-sm font-semibold text-slate-200 group-hover:text-white">Motor starter elektrik mati / tombol starter tidak merespon sama sekali</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 mt-1">Saat tombol starter dipencet tidak ada suara dinamo berputar atau hanya terdengar bunyi 'klik' halus di bawah jok.</p>
+                                </div>
+                            </label>
+
+                            <!-- G02 -->
+                            <label for="gejala-G02" class="flex items-start p-4 rounded-2xl bg-slate-900/60 hover:bg-slate-900 border border-slate-700/50 hover:border-orange-500/50 cursor-pointer transition-all duration-200 group">
+                                <div class="flex items-center h-6">
+                                    <input id="gejala-G02" name="gejala" value="G02" type="checkbox" class="custom-checkbox">
+                                </div>
+                                <div class="ml-4 flex-1">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="inline-block px-2 py-0.5 rounded text-xs font-mono font-semibold bg-orange-500/10 text-orange-400 border border-orange-500/20">G02</span>
+                                        <span class="text-sm font-semibold text-slate-200 group-hover:text-white">Lampu depan redup atau klakson berbunyi kecil saat mesin langsam</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 mt-1">Cahaya lampu baru terang saat gas dipelintir, klakson serak ketika motor berhenti di lampu merah.</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- KATEGORI 2: Bagian Mesin & Performa -->
+                    <div class="bg-slate-800/80 border border-slate-700/70 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+                        <div class="absolute -right-8 -top-8 w-32 h-32 bg-orange-500/5 rounded-full blur-2xl pointer-events-none"></div>
+                        
+                        <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-slate-700/60">
+                            <div class="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">Bagian Mesin & Performa</h3>
+                                <p class="text-xs text-slate-400">Permasalahan ruang bakar, suplai bensin, kompresi, dan pelumasan mesin</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <!-- G03 -->
+                            <label for="gejala-G03" class="flex items-start p-4 rounded-2xl bg-slate-900/60 hover:bg-slate-900 border border-slate-700/50 hover:border-orange-500/50 cursor-pointer transition-all duration-200 group">
+                                <div class="flex items-center h-6">
+                                    <input id="gejala-G03" name="gejala" value="G03" type="checkbox" class="custom-checkbox">
+                                </div>
+                                <div class="ml-4 flex-1">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="inline-block px-2 py-0.5 rounded text-xs font-mono font-semibold bg-orange-500/10 text-orange-400 border border-orange-500/20">G03</span>
+                                        <span class="text-sm font-semibold text-slate-200 group-hover:text-white">Mesin motor ngempos, brebet, atau tarikan gas terasa berat / kosong</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 mt-1">Akselerasi tertahan, tersendat saat gas diputar tiba-tiba, atau kecepatan motor tidak mau bertambah.</p>
+                                </div>
+                            </label>
+
+                            <!-- G04 -->
+                            <label for="gejala-G04" class="flex items-start p-4 rounded-2xl bg-slate-900/60 hover:bg-slate-900 border border-slate-700/50 hover:border-orange-500/50 cursor-pointer transition-all duration-200 group">
+                                <div class="flex items-center h-6">
+                                    <input id="gejala-G04" name="gejala" value="G04" type="checkbox" class="custom-checkbox">
+                                </div>
+                                <div class="ml-4 flex-1">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="inline-block px-2 py-0.5 rounded text-xs font-mono font-semibold bg-orange-500/10 text-orange-400 border border-orange-500/20">G04</span>
+                                        <span class="text-sm font-semibold text-slate-200 group-hover:text-white">Knalpot mengeluarkan asap putih/hitam pekat dan boros bensin</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 mt-1">Asap berbau sangit khas oli terbakar atau asap hitam jelaga dengan konsumsi bahan bakar yang boros tidak wajar.</p>
+                                </div>
+                            </label>
+
+                            <!-- G05 -->
+                            <label for="gejala-G05" class="flex items-start p-4 rounded-2xl bg-slate-900/60 hover:bg-slate-900 border border-slate-700/50 hover:border-orange-500/50 cursor-pointer transition-all duration-200 group">
+                                <div class="flex items-center h-6">
+                                    <input id="gejala-G05" name="gejala" value="G05" type="checkbox" class="custom-checkbox">
+                                </div>
+                                <div class="ml-4 flex-1">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="inline-block px-2 py-0.5 rounded text-xs font-mono font-semibold bg-orange-500/10 text-orange-400 border border-orange-500/20">G05</span>
+                                        <span class="text-sm font-semibold text-slate-200 group-hover:text-white">Mesin cepat sekali panas dan terdengar suara ketukan kasar di area blok silinder</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 mt-1">Hawa panas abnormal menyengat kaki, diiringi bunyi 'klotok-klotok' atau 'tik-tik' yang semakin kencang saat putaran RPM mesin naik.</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- KATEGORI 3: Bagian Transmisi / CVT (Matic) -->
+                    <div class="bg-slate-800/80 border border-slate-700/70 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+                        <div class="absolute -right-8 -top-8 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none"></div>
+                        
+                        <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-slate-700/60">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">Bagian Transmisi / CVT (Matic)</h3>
+                                <p class="text-xs text-slate-400">Permasalahan transfer tenaga roda, pulley, kampas ganda, dan v-belt</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <!-- G06 -->
+                            <label for="gejala-G06" class="flex items-start p-4 rounded-2xl bg-slate-900/60 hover:bg-slate-900 border border-slate-700/50 hover:border-orange-500/50 cursor-pointer transition-all duration-200 group">
+                                <div class="flex items-center h-6">
+                                    <input id="gejala-G06" name="gejala" value="G06" type="checkbox" class="custom-checkbox">
+                                </div>
+                                <div class="ml-4 flex-1">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="inline-block px-2 py-0.5 rounded text-xs font-mono font-semibold bg-orange-500/10 text-orange-400 border border-orange-500/20">G06</span>
+                                        <span class="text-sm font-semibold text-slate-200 group-hover:text-white">Terdengar suara berdecit atau getaran kasar (gredek) saat awal gas ditarik</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 mt-1">Bodi motor bergetar hebat saat mulai berakselerasi pada kecepatan 0-20 km/jam disertai bunyi selip berdecit.</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Tombol Aksi Submit & Reset -->
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
+                        <button type="button" onclick="resetDiagnosaForm()" class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-sm font-medium border border-slate-700 transition duration-200 flex items-center justify-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            <span>Reset Gejala Terpilih</span>
+                        </button>
+                        
+                        <button type="submit" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-base shadow-lg shadow-orange-500/30 transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center space-x-3">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>Analisis Kerusakan Sekarang</span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Peringatan Kosong (Alert jika belum pilih gejala) -->
+                <div id="alert-kosong" class="hidden mt-8 p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 flex items-start space-x-3.5 animate-bounce">
+                    <svg class="w-6 h-6 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <div>
+                        <h4 class="font-bold text-sm sm:text-base text-amber-200">Mohon Pilih Minimal Satu Gejala!</h4>
+                        <p class="text-xs sm:text-sm text-amber-300/90 mt-1">Anda belum mencentang satu pun keluhan pada formulir di atas. Silakan centang gejala yang sesuai dengan kondisi motor Anda agar sistem pakar dapat menganalisisnya.</p>
+                    </div>
+                </div>
+
+                <!-- Bagian Hasil Analisis Dinamis -->
+                <div id="section-hasil" class="hidden mt-12 scroll-mt-28">
+                    <!-- Header Ringkasan Hasil -->
+                    <div class="bg-gradient-to-r from-orange-500/20 via-amber-500/15 to-transparent border border-orange-500/30 rounded-3xl p-6 sm:p-8 mb-8 backdrop-blur-sm">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                                <div class="flex flex-wrap items-center gap-2 mb-2">
+                                    <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-orange-500/20 text-orange-300 text-xs font-semibold">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                        <span>Diagnosa Selesai Dihitung</span>
+                                    </span>
+                                    <span id="badge-risk-level" class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700">Status Risiko</span>
+                                </div>
+                                <h3 class="text-2xl font-extrabold text-white">Hasil Analisis Kerusakan Motor Anda</h3>
+                                <p class="text-sm text-slate-300 mt-1">Ditemukan <span id="count-kerusakan" class="font-bold text-orange-400">0</span> indikasi permasalahan dari gejala yang Anda centang.</p>
+                            </div>
+                            <div class="text-left sm:text-right bg-slate-900/80 p-4 rounded-2xl border border-slate-700">
+                                <p class="text-xs text-slate-400">Total Akumulasi Estimasi Biaya</p>
+                                <p id="total-estimasi-biaya" class="text-lg sm:text-xl font-extrabold text-orange-400 mt-0.5">Rp 0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Container Card List Hasil Dinamis -->
+                    <div id="container-kartu-hasil" class="space-y-6">
+                        <!-- Kartu hasil diagnosa digenerate oleh app.js -->
+                    </div>
+                    <p id="save-diagnosis-status" class="mt-4 text-xs text-slate-400" role="status" aria-live="polite"></p>
+
+                    <!-- Tips Menghadapi Mekanik Bengkel -->
+                    <div class="mt-8 p-6 rounded-3xl bg-slate-800/90 border border-slate-700/80 shadow-lg">
+                        <div class="flex items-start space-x-3.5">
+                            <div class="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-base font-bold text-white">Panduan Cerdas Menghadapi Mekanik (Anti-Overcharging)</h4>
+                                <ul class="text-xs sm:text-sm text-slate-300 mt-2 space-y-1.5 list-disc list-inside">
+                                    <li>Perhatikan <span class="text-orange-400 font-medium">Status Urgensi Penggantian Komponen</span> pada kartu hasil diagnosa di atas sebelum menyetujui pergantian sparepart baru.</li>
+                                    <li>Tunjukkan estimasi biaya acuan dari MotoCheck ini sebelum mekanik membongkar bagian mesin.</li>
+                                    <li>Minta selalu suku cadang bekas yang diganti sebagai bukti bahwa komponen lama memang benar-benar sudah aus.</li>
+                                    <li>Tanyakan biaya jasa bongkar pasang di awal sebelum tindakan perbaikan dimulai.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ======================================================= -->
+        <!-- TAB 3: KATALOG & JADWAL PERAWATAN BERKALA               -->
+        <!-- ======================================================= -->
+        <section id="tab-katalog" class="tab-content hidden transition-opacity duration-300 py-10 lg:py-16">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Section Header -->
+                <div class="text-center mb-10">
+                    <span class="inline-block px-3.5 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-semibold uppercase tracking-wider mb-3">
+                        Pemeliharaan Preventif
+                    </span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Katalog & Jadwal Perawatan Berkala</h2>
+                    <p class="text-slate-400 mt-2 text-sm sm:text-base max-w-2xl mx-auto">
+                        Cek jadwal penggantian suku cadang motor Anda sesuai kilometer tempuh (KM) dan gunakan fitur filter katalog untuk mencari informasi sparepart secara cepat.
+                    </p>
+                </div>
+
+                <!-- Input Jarak Tempuh Motor (KM) Checker Card -->
+                <div class="bg-gradient-to-b from-slate-800 to-slate-800/80 border border-slate-700/80 rounded-3xl p-6 sm:p-10 shadow-2xl mb-12 relative overflow-hidden">
+                    <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <div class="max-w-2xl mx-auto text-center">
+                        <div class="w-16 h-16 rounded-2xl bg-orange-500/20 text-orange-400 flex items-center justify-center mx-auto mb-4 border border-orange-500/30">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-bold text-white mb-2">Berapa Odometer (KM) Motormu Saat Ini?</h3>
+                        <p class="text-slate-400 text-xs sm:text-sm mb-6">Masukkan angka kilometer tempuh motor Anda untuk memunculkan evaluasi status servis yang jatuh tempo.</p>
+
+                        <!-- Input KM & Tombol Cek Status Servis KM -->
+                        <div class="flex flex-col sm:flex-row gap-3 items-stretch justify-center">
+                            <div class="relative flex-grow max-w-md">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                                    <span class="text-sm font-semibold">KM:</span>
+                                </div>
+                                <input type="number" id="input-km" placeholder="Contoh: 12500" min="0" step="100"
+                                    class="w-full pl-14 pr-4 py-3.5 bg-slate-900 border border-slate-700 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 rounded-2xl text-white text-base font-semibold placeholder-slate-500 transition-all outline-none">
+                            </div>
+                            <button onclick="cekKatalogKm()" 
+                                class="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-sm sm:text-base shadow-lg shadow-orange-500/25 transition-all duration-200 flex items-center justify-center space-x-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                                <span>Cek Status Servis KM</span>
+                            </button>
+                        </div>
+
+                        <!-- Shortcut Quick KM Chips -->
+                        <div class="flex flex-wrap items-center justify-center gap-2 mt-4">
+                            <span class="text-xs text-slate-500 mr-1">Preset Cepat:</span>
+                            <button type="button" onclick="setKmValue(2500)" class="text-xs px-2.5 py-1 rounded-lg bg-slate-900/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">2.500 KM</button>
+                            <button type="button" onclick="setKmValue(8500)" class="text-xs px-2.5 py-1 rounded-lg bg-slate-900/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">8.500 KM</button>
+                            <button type="button" onclick="setKmValue(15000)" class="text-xs px-2.5 py-1 rounded-lg bg-slate-900/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">15.000 KM</button>
+                            <button type="button" onclick="setKmValue(22000)" class="text-xs px-2.5 py-1 rounded-lg bg-slate-900/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">22.000 KM</button>
+                            <button type="button" onclick="setKmValue(45000)" class="text-xs px-2.5 py-1 rounded-lg bg-slate-900/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">45.000 KM</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bagian Tabel Katalog Berfilter -->
+                <div class="bg-slate-800/80 border border-slate-700/70 rounded-3xl p-6 sm:p-8 shadow-xl">
+                    
+                    <!-- Header Tabel & Bar Filter Interaktif -->
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between pb-6 mb-6 border-b border-slate-700/60 gap-4">
+                        <div>
+                            <h3 class="text-xl font-bold text-white">Tabel Standar Penggantian Sparepart</h3>
+                            <p class="text-xs sm:text-sm text-slate-400 mt-1">Standar servis berkala pabrikan sepeda motor di Indonesia (Honda, Yamaha, Suzuki)</p>
+                        </div>
+                        
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span id="katalog-match-count" class="px-3 py-1 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-semibold">
+                                5 Item Ditampilkan
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Toolbar Filter: Pencarian Real-Time & Dropdown Kategori -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+                        <!-- Pencarian Real-Time -->
+                        <div class="sm:col-span-2 relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </div>
+                            <input type="text" id="search-katalog" oninput="filterKatalog()" placeholder="Cari sparepart (contoh: oli, busi, rem, v-belt)..."
+                                class="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-700 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 rounded-xl text-sm text-white placeholder-slate-500 transition-all outline-none">
+                        </div>
+
+                        <!-- Dropdown Kategori -->
+                        <div class="relative">
+                            <select id="kategori-filter" onchange="filterKatalog()"
+                                class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 rounded-xl text-sm text-white transition-all outline-none cursor-pointer">
+                                <option value="all">Semua Kategori</option>
+                                <option value="mesin">Mesin & Pelumasan</option>
+                                <option value="kelistrikan">Pengapian & Kelistrikan</option>
+                                <option value="cvt">Transmisi / CVT</option>
+                                <option value="pengereman">Pengereman</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Tabel Jadwal Suku Cadang -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-700/80 text-xs font-bold uppercase tracking-wider text-slate-400 bg-slate-900/40">
+                                    <th class="py-4 px-4">Kategori</th>
+                                    <th class="py-4 px-4">Nama Suku Cadang</th>
+                                    <th class="py-4 px-4">Interval Penggantian</th>
+                                    <th class="py-4 px-4">Estimasi Rentang Harga</th>
+                                    <th class="py-4 px-4 hidden md:table-cell">Keterangan / Gejala Aus</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body-katalog" class="divide-y divide-slate-700/50 text-sm">
+                                
+                                <!-- 1. Oli Mesin -->
+                                <tr class="katalog-row hover:bg-slate-700/30 transition-colors" data-kategori="mesin">
+                                    <td class="py-4 px-4">
+                                        <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 whitespace-nowrap">
+                                            Mesin & Pelumasan
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-4 font-semibold text-white">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-9 h-9 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center flex-shrink-0">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                                            </div>
+                                            <div>
+                                                <span>Oli Mesin</span>
+                                                <span class="block md:hidden text-xs text-slate-400">Wajib rutin untuk cegah silinder baret</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-4">
+                                        <span class="px-2.5 py-1 rounded-lg bg-slate-900 text-orange-400 border border-slate-700 font-mono text-xs font-semibold whitespace-nowrap">
+                                            Setiap 2.000 - 2.500 KM
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-4 font-bold text-slate-200 whitespace-nowrap">
+                                        Rp 45.000 - Rp 85.000
+                                    </td>
+                                    <td class="py-4 px-4 text-xs text-slate-400 hidden md:table-cell">
+                                        Wajib rutin diganti; oli menghitam dan viskositas encer bisa memicu panas ekstrem dan piston macet.
+                                    </td>
+                                </tr>
+
+                                <!-- 2. Busi Motor -->
+                                <tr class="katalog-row hover:bg-slate-700/30 transition-colors" data-kategori="kelistrikan">
+                                    <td class="py-4 px-4">
+                                        <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 whitespace-nowrap">
+                                            Pengapian & Kelistrikan
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-4 font-semibold text-white">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center flex-shrink-0">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                            </div>
+                                            <div>
+                                                <span>Busi Motor</span>
+                                                <span class="block md:hidden text-xs text-slate-400">Pemicu percikan api ruang bakar</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-4">
+                                        <span class="px-2.5 py-1 rounded-lg bg-slate-900 text-orange-400 border border-slate-700 font-mono text-xs font-semibold whitespace-nowrap">
+                                            Setiap 8.000 - 10.000 KM
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-4 font-bold text-slate-200 whitespace-nowrap">
+                                        Rp 20.000 - Rp 40.000
+                                    </td>
+                                    <td class="py-4 px-4 text-xs text-slate-400 hidden md:table-cell">
+                                        Elektroda busi aus menyebabkan mesin susah distarter di pagi hari dan sering brebet.
+                                    </td>
+                                </tr>
+
+                                <!-- 3. V-Belt & Roller (Matic) -->
+                                <tr class="katalog-row hover:bg-slate-700/30 transition-colors" data-kategori="cvt">
+                                    <td class="py-4 px-4">
+                                        <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap">
+                                            Transmisi / CVT
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-4 font-semibold text-white">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-9 h-9 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center flex-shrink-0">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                                            </div>
+                                            <div>
+                                                <span>V-Belt & Roller (Matic)</span>
+                                                <span class="block md:hidden text-xs text-slate-400">Penyalur daya ke roda belakang</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-4">
+                                        <span class="px-2.5 py-1 rounded-lg bg-slate-900 text-orange-400 border border-slate-700 font-mono text-xs font-semibold whitespace-nowrap">
+                                            Setiap 20.000 - 24.000 KM
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-4 font-bold text-slate-200 whitespace-nowrap">
+                                        Rp 150.000 - Rp 250.000
+                                    </td>
+                                    <td class="py-4 px-4 text-xs text-slate-400 hidden md:table-cell">
+                                        Retak pada sabuk v-belt berisiko putus mendadak di jalan; roller peyang membuat akselerasi loyo.
+                                    </td>
+                                </tr>
+
+                                <!-- 4. Kampas Rem Depan / Belakang -->
+                                <tr class="katalog-row hover:bg-slate-700/30 transition-colors" data-kategori="pengereman">
+                                    <td class="py-4 px-4">
+                                        <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20 whitespace-nowrap">
+                                            Pengereman
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-4 font-semibold text-white">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center flex-shrink-0">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                            </div>
+                                            <div>
+                                                <span>Kampas Rem Depan / Belakang</span>
+                                                <span class="block md:hidden text-xs text-slate-400">Komponen keselamatan vital</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-4">
+                                        <span class="px-2.5 py-1 rounded-lg bg-slate-900 text-orange-400 border border-slate-700 font-mono text-xs font-semibold whitespace-nowrap">
+                                            Setiap 10.000 - 15.000 KM
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-4 font-bold text-slate-200 whitespace-nowrap">
+                                        Rp 50.000 - Rp 95.000
+                                    </td>
+                                    <td class="py-4 px-4 text-xs text-slate-400 hidden md:table-cell">
+                                        Bila dibiarkan habis besi kampas akan merusak dan menggores piringan cakram atau tromol roda.
+                                    </td>
+                                </tr>
+
+                                <!-- 5. Filter Udara -->
+                                <tr class="katalog-row hover:bg-slate-700/30 transition-colors" data-kategori="mesin">
+                                    <td class="py-4 px-4">
+                                        <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 whitespace-nowrap">
+                                            Mesin & Pelumasan
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-4 font-semibold text-white">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-9 h-9 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center flex-shrink-0">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                                            </div>
+                                            <div>
+                                                <span>Filter Udara</span>
+                                                <span class="block md:hidden text-xs text-slate-400">Penyaring debu pembakaran</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-4">
+                                        <span class="px-2.5 py-1 rounded-lg bg-slate-900 text-orange-400 border border-slate-700 font-mono text-xs font-semibold whitespace-nowrap">
+                                            Setiap 15.000 KM
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-4 font-bold text-slate-200 whitespace-nowrap">
+                                        Rp 40.000 - Rp 70.000
+                                    </td>
+                                    <td class="py-4 px-4 text-xs text-slate-400 hidden md:table-cell">
+                                        Filter tipe viscous (berminyak) tidak boleh dicuci, jika kotor pekat wajib diganti baru agar suplai udara lancar.
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+
+                        <!-- Empty State Jika Filter Kosong -->
+                        <div id="empty-state-katalog" class="hidden py-12 text-center">
+                            <div class="w-12 h-12 rounded-2xl bg-slate-800 text-slate-500 flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <h4 class="text-base font-semibold text-slate-300">Suku Cadang Tidak Ditemukan</h4>
+                            <p class="text-xs text-slate-500 mt-1">Coba gunakan kata kunci pencarian yang lain atau ubah pilihan kategori filter.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal Popup Kustom Rekomendasi Servis KM -->
+    <div id="modal-km" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+        <div id="modal-card" class="bg-slate-800 border border-slate-700 w-full max-w-xl rounded-3xl p-6 sm:p-8 shadow-2xl transform scale-95 transition-transform duration-300 max-h-[90vh] overflow-y-auto">
+            
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between pb-4 border-b border-slate-700">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Status Servis Rekomendasi</h3>
+                        <p id="modal-subtitle" class="text-xs text-slate-400">Jarak Tempuh: 0 KM</p>
+                    </div>
+                </div>
+                <button onclick="closeModalKm()" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700/60 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Modal List Content -->
+            <div class="py-5 space-y-4" id="modal-content-list">
+                <!-- Diisi secara dinamis oleh app.js -->
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="pt-4 border-t border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <p class="text-xs text-slate-400">Lakukan servis rutin tepat waktu untuk menjaga keamanan & keawetan mesin motor.</p>
+                <button onclick="closeModalKm()" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm transition">
+                    Tutup
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 border-t border-slate-800 py-8 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4">
+            <p class="font-semibold text-slate-400">MotoCheck &copy; 2026 - Sistem Pakar Diagnosa Kerusakan Sepeda Motor Berbasis Web</p>
+            <p class="mt-1">Dibuat terpisah secara rapi (HTML5, style.css, dan app.js). Solusi cerdas pencegahan overcharging bengkel motor.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
